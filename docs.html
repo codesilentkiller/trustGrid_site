@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustGrid - Developer Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg: #0A0A0A;
+            --surface: #111111;
+            --surface2: #1a1a1a;
+            --border: rgba(0,200,150,0.15);
+            --border2: rgba(0,200,150,0.08);
+            --accent: #00c896;
+            --accent2: #00e5b0;
+            --accent-dim: rgba(0,200,150,0.12);
+            --text: #FFFFFF;
+            --muted: #6b8a7a;
+            --danger: #ff4d6d;
+            --warn: #f5a623;
+            --mono: 'Space Mono', monospace;
+            --display: 'Syne', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--display);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,200,150,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,200,150,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(0,200,150,0.08), transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(0,200,150,0.08), transparent 50%);
+        }
+
+        section, nav, footer { position: relative; z-index: 1; }
+
+        .navbar {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #0A0A0A;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 30px rgba(0,200,150,0.35);
+        }
+        
+        .btn-secondary {
+            border: 1px solid var(--border);
+            background: transparent;
+            transition: all 0.3s ease;
+            color: var(--text);
+        }
+        .btn-secondary:hover {
+            background: rgba(0,200,150,0.1);
+            border-color: var(--accent);
+        }
+        
+        .docs-sidebar {
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+            border-right: 1px solid var(--border);
+        }
+        
+        .docs-sidebar a {
+            display: block;
+            padding: 10px 16px;
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 2px solid transparent;
+        }
+        
+        .docs-sidebar a:hover {
+            color: var(--accent);
+            background: var(--accent-dim);
+        }
+        
+        .docs-sidebar a.active {
+            color: var(--accent);
+            border-left-color: var(--accent);
+            background: var(--accent-dim);
+        }
+        
+        .docs-content h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .docs-content h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .docs-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .docs-content p {
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+        
+        .code-block {
+            background: #0A0A0A;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+        }
+        
+        .code-block pre {
+            color: var(--accent);
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        .card {
+            background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-family: var(--mono);
+            font-weight: 600;
+        }
+        
+        .badge-post { background: rgba(0,200,150,0.15); color: var(--accent); border: 1px solid var(--border); }
+        .badge-get { background: rgba(0,200,150,0.15); color: var(--accent); border: 1px solid var(--border); }
+        
+        .endpoint {
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+        
+        .endpoint:last-child { border-bottom: none; }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .docs-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        
+        .docs-table th, .docs-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border2);
+        }
+        
+        .docs-table th {
+            color: var(--accent);
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        
+        @media (max-width: 768px) {
+            .docs-sidebar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">TrustGrid</div>
+        <div class="hidden md:flex space-x-8">
+            <a href="/index.html" class="text-gray-400 hover:text-emerald-400 transition text-sm font-mono">Home</a>
+            <a href="/features.html" class="text-gray-400 hover:text-emerald-400 transition text-sm font-mono">Features</a>
+            <a href="/docs.html" class="text-emerald-400 transition text-sm font-mono">Docs</a>
+            <a href="/pricing.html" class="text-gray-400 hover:text-emerald-400 transition text-sm font-mono">Pricing</a>
+            <a href="/blog.html" class="text-gray-400 hover:text-emerald-400 transition text-sm font-mono">Blog</a>
+            <a href="/contact.html" class="text-gray-400 hover:text-emerald-400 transition text-sm font-mono">Contact</a>
+        </div>
+        <button class="btn-primary px-5 py-2 rounded-lg text-sm font-semibold">Get API Key →</button>
+    </div>
+</nav>
+
+<!-- Documentation Layout -->
+<section class="max-w-7xl mx-auto px-6 py-8">
+    <div class="flex gap-8">
+        
+        <!-- Sidebar -->
+        <aside class="docs-sidebar w-64 flex-shrink-0 hidden md:block">
+            <div class="p-4">
+                <div class="text-xs text-gray-500 font-mono mb-4 uppercase tracking-wider">Getting Started</div>
+                <a href="#introduction" class="active">Introduction</a>
+                <a href="#quick-start">Quick Start</a>
+                <a href="#installation">Installation</a>
+                <a href="#dependencies">Dependencies</a>
+                
+                <div class="text-xs text-gray-500 font-mono mb-4 mt-6 uppercase tracking-wider">API Reference</div>
+                <a href="#authentication">Authentication</a>
+                <a href="#endpoints">Endpoints</a>
+                <a href="#request-format">Request Format</a>
+                <a href="#response-format">Response Format</a>
+                <a href="#error-codes">Error Codes</a>
+                
+                <div class="text-xs text-gray-500 font-mono mb-4 mt-6 uppercase tracking-wider">Integration</div>
+                <a href="#fintech-integration">Fintech Integration</a>
+                <a href="#startup-integration">Startup Integration</a>
+                <a href="#b2b-integration">B2B Integration</a>
+                
+                <div class="text-xs text-gray-500 font-mono mb-4 mt-6 uppercase tracking-wider">Risk Engine</div>
+                <a href="#scoring-engine">Scoring Engine</a>
+                <a href="#decision-logic">Decision Logic</a>
+                <a href="#why-flagged">Why Transactions Are Flagged</a>
+                <a href="#holdback-reasons">Holdback Reasons</a>
+                
+                <div class="text-xs text-gray-500 font-mono mb-4 mt-6 uppercase tracking-wider">SDKs</div>
+                <a href="#nodejs-sdk">Node.js SDK</a>
+                <a href="#python-sdk">Python SDK</a>
+                <a href="#ruby-sdk">Ruby SDK</a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="docs-content flex-1 max-w-4xl">
+            
+            <!-- Introduction -->
+            <h1 id="introduction">TrustGrid Documentation</h1>
+            <p>TrustGrid is a real-time fraud detection API that helps fintech companies, startups, and enterprises prevent fraudulent transactions. This documentation will guide you through integration, API usage, and understanding risk scoring.</p>
+            
+            <div class="card">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="text-2xl">⚡</span>
+                    <span class="font-semibold">Key Features</span>
+                </div>
+                <ul class="space-y-2 text-gray-400 text-sm">
+                    <li>• Sub-25ms response time</li>
+                    <li>• 5-factor weighted scoring model</li>
+                    <li>• Behavioral profiling per user</li>
+                    <li>• Multi-tenant architecture</li>
+                    <li>• SOC2 compliant and GDPR ready</li>
+                </ul>
+            </div>
+            
+            <!-- Quick Start -->
+            <h2 id="quick-start">Quick Start</h2>
+            <p>Get started with TrustGrid in 3 simple steps:</p>
+            
+            <div class="code-block">
+                <pre># 1. Install the SDK
+npm install @trustgrid/node
+
+# 2. Initialize with your API key
+const trustgrid = new TrustGrid({
+  apiKey: 'tg_v1_your_api_key_here'
+});
+
+# 3. Check a transaction
+const result = await trustgrid.check({
+  transaction_id: 'tx_001',
+  user_id: 'user_123',
+  amount: 5000,
+  currency: 'USD'
+});
+
+console.log(result);
+// { risk_score: 55, decision: 'flag', action: 'SOFT_DECLINE' }</pre>
+            </div>
+            
+            <!-- Installation -->
+            <h2 id="installation">Installation</h2>
+            <p>Choose your preferred package manager:</p>
+            
+            <div class="code-block">
+                <pre># npm
+npm install @trustgrid/node
+
+# yarn
+yarn add @trustgrid/node
+
+# pnpm
+pnpm add @trustgrid/node</pre>
+            </div>
+            
+            <!-- Dependencies -->
+            <h2 id="dependencies">Dependencies</h2>
+            <div class="table-wrapper">
+                <table class="docs-table">
+                    <thead>
+                        <tr><th>Package</th><th>Version</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Node.js</td><td>18+</td><td>Runtime environment</td></tr>
+                        <tr><td>MySQL</td><td>8.0+</td><td>Primary database</td></tr>
+                        <tr><td>Redis</td><td>7.0+</td><td>Caching and rate limiting</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Authentication -->
+            <h2 id="authentication">Authentication</h2>
+            <p>All API requests require an API key in the Authorization header:</p>
+            <div class="code-block">
+                <pre>Authorization: Bearer tg_v1_your_api_key_here</pre>
+            </div>
+            <p>Generate your API key from the dashboard or via the API:</p>
+            <div class="code-block">
+                <pre>curl -X POST https://api.trustgrid.com/v1/keys \
+  -H "Authorization: Bearer YOUR_ADMIN_KEY" \
+  -d '{"name": "Production Key", "rate_limit": 500}'</pre>
+            </div>
+            
+            <!-- Endpoints -->
+            <h2 id="endpoints">API Endpoints</h2>
+            
+            <div class="endpoint">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="badge badge-post">POST</span>
+                    <code class="text-emerald-400">/api/v1/check</code>
+                </div>
+                <p class="text-gray-400 text-sm">Primary fraud detection endpoint</p>
+            </div>
+            
+            <div class="endpoint">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="badge badge-post">POST</span>
+                    <code class="text-emerald-400">/api/v1/keys</code>
+                </div>
+                <p class="text-gray-400 text-sm">Generate new API keys</p>
+            </div>
+            
+            <div class="endpoint">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="badge badge-get">GET</span>
+                    <code class="text-emerald-400">/api/v1/keys</code>
+                </div>
+                <p class="text-gray-400 text-sm">List all API keys</p>
+            </div>
+            
+            <div class="endpoint">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="badge badge-get">GET</span>
+                    <code class="text-emerald-400">/health</code>
+                </div>
+                <p class="text-gray-400 text-sm">Health check endpoint</p>
+            </div>
+            
+            <!-- Request Format -->
+            <h2 id="request-format">Request Format</h2>
+            <div class="code-block">
+                <pre>{
+  "transaction_id": "string (required, max 100 chars)",
+  "user_id": "string (required, max 255 chars)",
+  "amount": "number (required, positive)",
+  "currency": "string (optional, default: USD)",
+  "device_id": "string (optional)",
+  "ip_address": "string (optional)",
+  "location": "string (optional)",
+  "payment_method": "string (optional)",
+  "timestamp": "ISO8601 (optional)"
+}</pre>
+            </div>
+            
+            <!-- Response Format -->
+            <h2 id="response-format">Response Format</h2>
+            <div class="code-block">
+                <pre>{
+  "success": true,
+  "data": {
+    "request_id": "uuid",
+    "risk_score": 75,
+    "fraud_probability": 0.82,
+    "confidence": 0.73,
+    "decision": "flag",
+    "action": "REQUIRE_2FA",
+    "severity": "MEDIUM",
+    "factor_contributions": {
+      "amount": { "raw": 45, "weighted": 11.25 },
+      "velocity": { "raw": 20, "weighted": 4 },
+      "location": { "raw": 50, "weighted": 12.5 },
+      "time": { "raw": 40, "weighted": 4 },
+      "behavioral": { "raw": 35, "weighted": 7 }
+    },
+    "active_factors": ["HIGH_AMOUNT", "UNUSUAL_HOUR", "NEW_DEVICE"],
+    "processing_time_ms": 23
+  }
+}</pre>
+            </div>
+            
+            <!-- Error Codes -->
+            <h2 id="error-codes">Error Codes</h2>
+            <div class="table-wrapper">
+                <table class="docs-table">
+                    <thead><tr><th>Code</th><th>Description</th><th>HTTP Status</th></tr></thead>
+                    <tbody>
+                        <tr><td>INVALID_API_KEY</td><td>Invalid or expired API key</td><td>401</td></tr>
+                        <tr><td>RATE_LIMIT_EXCEEDED</td><td>Too many requests</td><td>429</td></tr>
+                        <tr><td>VALIDATION_ERROR</td><td>Invalid request payload</td><td>400</td></tr>
+                        <tr><td>INTERNAL_ERROR</td><td>Server error</td><td>500</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Fintech Integration -->
+            <h2 id="fintech-integration">Fintech Integration</h2>
+            <p>For fintech companies processing payments, cards, or transfers:</p>
+            <div class="code-block">
+                <pre>// Banking/Fintech example
+const result = await trustgrid.check({
+  transaction_id: wire_transfer.id,
+  user_id: account.owner_id,
+  amount: wire_transfer.amount,
+  payment_method: 'wire_transfer',
+  device_id: session.device_fingerprint,
+  ip_address: request.ip
+});
+
+if (result.decision === 'block') {
+  await blockWireTransfer(wire_transfer.id);
+  await alertFraudTeam({
+    transaction: wire_transfer,
+    risk_score: result.risk_score,
+    factors: result.active_factors
+  });
+}</pre>
+            </div>
+            
+            <!-- Startup Integration -->
+            <h2 id="startup-integration">Startup Integration</h2>
+            <p>For startups and early-stage companies:</p>
+            <div class="code-block">
+                <pre>// Startup/Payment processing example
+const result = await trustgrid.check({
+  transaction_id: payment.id,
+  user_id: customer.id,
+  amount: payment.amount,
+  payment_method: 'credit_card',
+  device_id: req.headers['user-agent']
+});
+
+if (result.decision === 'flag') {
+  await sendTwoFactorCode(customer.phone);
+  await logForReview(payment);
+} else if (result.decision === 'approve') {
+  await processPayment(payment);
+}</pre>
+            </div>
+            
+            <!-- B2B Integration -->
+            <h2 id="b2b-integration">B2B Integration</h2>
+            <p>For enterprise and B2B platforms:</p>
+            <div class="code-block">
+                <pre>// Enterprise/B2B example
+const result = await trustgrid.check({
+  transaction_id: invoice.payment_id,
+  user_id: business.customer_id,
+  amount: invoice.amount,
+  payment_method: 'ach',
+  location: business.headquarters,
+  metadata: {
+    customer_tenure_days: customer.age,
+    previous_disputes: customer.chargeback_count,
+    annual_volume: business.yearly_revenue
+  }
+});
+
+// Custom thresholds for B2B
+const THRESHOLDS = {
+  approve: 35,
+  flag: 60,
+  block: 85
+};</pre>
+            </div>
+            
+            <!-- Scoring Engine -->
+            <h2 id="scoring-engine">Scoring Engine</h2>
+            <p>TrustGrid uses a weighted multi-factor scoring model:</p>
+            <div class="card">
+                <div class="space-y-3">
+                    <div><span class="text-emerald-400 font-mono">25%</span> Amount Deviation - Statistical anomaly detection</div>
+                    <div><span class="text-emerald-400 font-mono">20%</span> Velocity Detection - Transaction frequency analysis</div>
+                    <div><span class="text-emerald-400 font-mono">25%</span> Location Intelligence - Geographic pattern analysis</div>
+                    <div><span class="text-emerald-400 font-mono">10%</span> Time Anomaly - Temporal pattern detection</div>
+                    <div><span class="text-emerald-400 font-mono">20%</span> Behavioral Profiling - User history comparison</div>
+                </div>
+            </div>
+            
+            <!-- Decision Logic -->
+            <h2 id="decision-logic">Decision Logic</h2>
+            <div class="table-wrapper">
+                <table class="docs-table">
+                    <thead><tr><th>Risk Score</th><th>Decision</th><th>Action</th><th>Severity</th></tr></thead>
+                    <tbody>
+                        <tr><td>0-40</td><td>APPROVE</td><td>PROCESS</td><td>NONE</td></tr>
+                        <tr><td>41-69</td><td>FLAG</td><td>REQUIRE_2FA</td><td>MEDIUM</td></tr>
+                        <tr><td>70-100</td><td>BLOCK</td><td>REJECT</td><td>HIGH</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Why Transactions Are Flagged -->
+            <h2 id="why-flagged">Why Transactions Are Flagged</h2>
+            <div class="space-y-4">
+                <div class="card">
+                    <h3 class="text-lg font-semibold mb-2">💰 Amount Deviation</h3>
+                    <p class="text-gray-400 text-sm">Transaction amount significantly exceeds user's historical average. Example: A user who typically sends $200 suddenly sends $10,000.</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-lg font-semibold mb-2">⚡ Velocity Spike</h3>
+                    <p class="text-gray-400 text-sm">Multiple transactions in a short time window. Example: 5+ transactions in 5 minutes indicates card testing or automated fraud.</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-lg font-semibold mb-2">📍 Location Mismatch</h3>
+                    <p class="text-gray-400 text-sm">Impossible travel or high-risk geography. Example: Transaction from New York and Tokyo within 30 minutes.</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-lg font-semibold mb-2">⏰ Time Anomaly</h3>
+                    <p class="text-gray-400 text-sm">Transaction at unusual hours (1-5 AM). Example: Business user making a large transaction at 3 AM.</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-lg font-semibold mb-2">📱 New Device</h3>
+                    <p class="text-gray-400 text-sm">Transaction from unrecognized device. Example: User's first transaction from a new phone or computer.</p>
+                </div>
+            </div>
+            
+            <!-- Holdback Reasons -->
+            <h2 id="holdback-reasons">Holdback Reasons</h2>
+            <div class="table-wrapper">
+                <table class="docs-table">
+                    <thead><tr><th>Reason Code</th><th>Description</th><th>Recommended Action</th></tr></thead>
+                    <tbody>
+                        <tr><td>HIGH_AMOUNT</td><td>Amount exceeds normal pattern</td><td>Verify with customer</td></tr>
+                        <tr><td>VELOCITY_SPIKE</td><td>Too many transactions</td><td>Temporarily rate limit</td></tr>
+                        <tr><td>LOCATION_MISMATCH</td><td>Suspicious geography</td><td>Require 2FA</td></tr>
+                        <tr><td>NEW_DEVICE</td><td>Unrecognized device</td><td>Send verification email</td></tr>
+                        <tr><td>UNUSUAL_HOUR</td><td>Off-hour transaction</td><td>Flag for review</td></tr>
+                        <tr><td>IMPOSSIBLE_TRAVEL</td><td>Geographically impossible</td><td>Block immediately</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- SDKs -->
+            <h2 id="nodejs-sdk">Node.js SDK</h2>
+            <div class="code-block">
+                <pre>import TrustGrid from '@trustgrid/node';
+
+const tg = new TrustGrid({ apiKey: process.env.TRUSTGRID_API_KEY });
+
+// Single transaction check
+const result = await tg.check({
+  amount: 5000,
+  user_id: 'user_123'
+});
+
+// Bulk check
+const results = await tg.bulkCheck([
+  { amount: 100, user_id: 'user_1' },
+  { amount: 5000, user_id: 'user_2' }
+]);</pre>
+            </div>
+            
+            <h2 id="python-sdk">Python SDK</h2>
+            <div class="code-block">
+                <pre>from trustgrid import TrustGrid
+
+tg = TrustGrid(api_key="tg_v1_xxx")
+
+result = tg.check(
+    transaction_id="tx_001",
+    user_id="user_123",
+    amount=5000
+)
+
+print(result.risk_score, result.decision)</pre>
+            </div>
+            
+            <h2 id="ruby-sdk">Ruby SDK</h2>
+            <div class="code-block">
+                <pre>require 'trustgrid'
+
+tg = TrustGrid.new(api_key: 'tg_v1_xxx')
+
+result = tg.check(
+  transaction_id: 'tx_001',
+  user_id: 'user_123',
+  amount: 5000
+)
+
+puts result.risk_score</pre>
+            </div>
+            
+            <!-- Support -->
+            <div class="card mt-8 text-center">
+                <h3 class="text-xl font-bold mb-2">Need Help?</h3>
+                <p class="text-gray-400 mb-4">Our team is available 24/7 to assist with integration</p>
+                <div class="flex gap-4 justify-center">
+                    <a href="/contact.html" class="btn-primary px-6 py-2 rounded-lg text-sm font-semibold">Contact Support</a>
+                    <a href="mailto:support@trustgrid.com" class="btn-secondary px-6 py-2 rounded-lg text-sm font-semibold">Email Us</a>
+                </div>
+            </div>
+            
+        </main>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="max-w-7xl mx-auto px-6 py-8 border-t border-white/10 text-center text-gray-500 text-sm mt-12">
+    <p>&copy; 2024 TrustGrid. All rights reserved. | <a href="#" class="hover:text-emerald-400 transition">Privacy</a> | <a href="#" class="hover:text-emerald-400 transition">Terms</a> | <a href="#" class="hover:text-emerald-400 transition">Security</a></p>
+</footer>
+
+<script>
+    // Highlight active sidebar link on scroll
+    const sections = document.querySelectorAll('.docs-content h1, .docs-content h2');
+    const navLinks = document.querySelectorAll('.docs-sidebar a');
+    
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (scrollY >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

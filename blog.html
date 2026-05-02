@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustGrid - Blog | Fraud Detection Insights & Updates</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg: #0A0A0A;
+            --surface: #111111;
+            --surface2: #1a1a1a;
+            --border: rgba(0,200,150,0.15);
+            --border2: rgba(0,200,150,0.08);
+            --accent: #00c896;
+            --accent2: #00e5b0;
+            --accent-dim: rgba(0,200,150,0.12);
+            --text: #FFFFFF;
+            --muted: #6b8a7a;
+            --mono: 'Space Mono', monospace;
+            --display: 'Syne', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--display);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,200,150,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,200,150,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(0,200,150,0.08), transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(0,200,150,0.08), transparent 50%);
+        }
+
+        section, nav, footer { position: relative; z-index: 1; }
+
+        .navbar {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #0A0A0A;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 30px rgba(0,200,150,0.35);
+        }
+        
+        .btn-secondary {
+            border: 1px solid var(--border);
+            background: transparent;
+            transition: all 0.3s ease;
+            color: var(--text);
+        }
+        .btn-secondary:hover {
+            background: rgba(0,200,150,0.1);
+            border-color: var(--accent);
+        }
+        
+        .card {
+            background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }
+        
+        .blog-card {
+            background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .blog-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--accent-dim);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-family: var(--mono);
+            color: var(--accent);
+        }
+        
+        .comment {
+            background: rgba(17, 17, 17, 0.4);
+            border: 1px solid var(--border2);
+            border-radius: 16px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        .comment:hover {
+            background: rgba(17, 17, 17, 0.6);
+            border-color: var(--border);
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: var(--mono);
+            color: var(--accent);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .category-active {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">TrustGrid</div>
+        <div class="hidden md:flex space-x-8">
+            <a href="/index.html" class="text-gray-400 hover:text-emerald-400 transition text-sm font-mono">Home</a>
+            <a href="/features.html" class="text-gray-400 hover:text-emerald-400 transition text-sm font-mono">Features</a>
+            <a href="/docs.html" class="text-gray-400 hover:text-emerald-400 transition text-sm font-mono">Docs</a>
+            <a href="/pricing.html" class="text-gray-400 hover:text-emerald-400 transition text-sm font-mono">Pricing</a>
+            <a href="/blog.html" class="text-emerald-400 transition text-sm font-mono">Blog</a>
+            <a href="/contact.html" class="text-gray-400 hover:text-emerald-400 transition text-sm font-mono">Contact</a>
+        </div>
+        <button class="btn-primary px-5 py-2 rounded-lg text-sm font-semibold">Get API Key →</button>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="max-w-7xl mx-auto px-6 pt-20 pb-12 text-center">
+    <div class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs mb-6 border border-emerald-500/20 font-mono">
+        // INSIGHTS & UPDATES
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">TrustGrid <span class="text-gradient">Blog</span></h1>
+    <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+        Insights, updates, and best practices for fraud detection in fintech.
+    </p>
+</section>
+
+<!-- Categories Filter -->
+<section class="max-w-7xl mx-auto px-6 py-8">
+    <div class="flex flex-wrap justify-center gap-3">
+        <button class="tag category-active" data-category="all">All Posts</button>
+        <button class="tag" data-category="updates">Product Updates</button>
+        <button class="tag" data-category="guides">Integration Guides</button>
+        <button class="tag" data-category="case-studies">Case Studies</button>
+        <button class="tag" data-category="industry">Industry Insights</button>
+    </div>
+</section>
+
+<!-- Blog Posts Grid -->
+<section class="max-w-7xl mx-auto px-6 py-8">
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="blogGrid">
+        
+        <!-- Post 1 - Product Update -->
+        <div class="blog-card" data-category="updates">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="tag">🚀 Product Update</span>
+                    <span class="text-xs text-gray-500 font-mono">Apr 28, 2024</span>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Real-Time Scoring Engine v2.0</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                    We've completely rebuilt our scoring engine with 5 weighted factors, achieving 99.7% accuracy and sub-25ms latency.
+                </p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-500">5 min read</span>
+                    <button onclick="openPost(1)" class="text-emerald-400 hover:text-emerald-300 transition text-sm font-mono">Read more →</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Post 2 - Integration Guide -->
+        <div class="blog-card" data-category="guides">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="tag">📘 Integration Guide</span>
+                    <span class="text-xs text-gray-500 font-mono">Apr 25, 2024</span>
+                </div>
+                <h3 class="text-xl font-bold mb-2">5-Minute Integration for Startups</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                    Learn how to integrate TrustGrid into your Node.js, Python, or Ruby application in under 5 minutes.
+                </p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-500">8 min read</span>
+                    <button onclick="openPost(2)" class="text-emerald-400 hover:text-emerald-300 transition text-sm font-mono">Read more →</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Post 3 - Case Study -->
+        <div class="blog-card" data-category="case-studies">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="tag">🏆 Case Study</span>
+                    <span class="text-xs text-gray-500 font-mono">Apr 20, 2024</span>
+                </div>
+                <h3 class="text-xl font-bold mb-2">How PayFast Reduced Fraud by 67%</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                    See how PayFast integrated TrustGrid's behavioral intelligence to detect and prevent fraudulent transactions.
+                </p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-500">10 min read</span>
+                    <button onclick="openPost(3)" class="text-emerald-400 hover:text-emerald-300 transition text-sm font-mono">Read more →</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Post 4 - Industry Insight -->
+        <div class="blog-card" data-category="industry">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="tag">📊 Industry Insight</span>
+                    <span class="text-xs text-gray-500 font-mono">Apr 15, 2024</span>
+                </div>
+                <h3 class="text-xl font-bold mb-2">The Rise of Behavioral Fraud</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                    Understanding how behavioral biometrics and AI are transforming fraud detection in 2024.
+                </p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-500">6 min read</span>
+                    <button onclick="openPost(4)" class="text-emerald-400 hover:text-emerald-300 transition text-sm font-mono">Read more →</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Post 5 - Product Update -->
+        <div class="blog-card" data-category="updates">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="tag">🔐 Security Update</span>
+                    <span class="text-xs text-gray-500 font-mono">Apr 10, 2024</span>
+                </div>
+                <h3 class="text-xl font-bold mb-2">SOC2 Type II Certification</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                    TrustGrid achieves SOC2 Type II compliance, reinforcing our commitment to enterprise security.
+                </p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-500">4 min read</span>
+                    <button onclick="openPost(5)" class="text-emerald-400 hover:text-emerald-300 transition text-sm font-mono">Read more →</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Post 6 - Integration Guide -->
+        <div class="blog-card" data-category="guides">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="tag">🛡️ Best Practices</span>
+                    <span class="text-xs text-gray-500 font-mono">Apr 5, 2024</span>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Optimizing Your Fraud Rules</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                    Best practices for configuring custom fraud rules and thresholds for your specific use case.
+                </p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-500">7 min read</span>
+                    <button onclick="openPost(6)" class="text-emerald-400 hover:text-emerald-300 transition text-sm font-mono">Read more →</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="max-w-3xl mx-auto px-6 py-16">
+    <div class="card p-8 text-center">
+        <div class="text-3xl mb-3">📬</div>
+        <h2 class="text-2xl font-bold mb-2">Subscribe to our newsletter</h2>
+        <p class="text-gray-400 mb-6">Get the latest fraud detection insights delivered to your inbox.</p>
+        <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <input type="email" placeholder="your@email.com" class="flex-1 bg-[#0A0A0A] border border-[#222] rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-emerald-500">
+            <button class="btn-primary px-6 py-2 rounded-lg text-sm font-semibold">Subscribe</button>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Post Modal & Comments Section (Hidden by default) -->
+<div id="postModal" class="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 hidden overflow-y-auto" onclick="closeModal(event)">
+    <div class="max-w-4xl mx-auto p-6 py-12" onclick="event.stopPropagation()">
+        <div class="card p-8 md:p-10">
+            <div class="flex justify-between items-start mb-6">
+                <span id="modalTag" class="tag">🚀 Product Update</span>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <h2 id="modalTitle" class="text-2xl md:text-3xl font-bold mb-4">Real-Time Scoring Engine v2.0</h2>
+            <div class="flex items-center gap-4 mb-6 text-sm text-gray-500">
+                <span id="modalDate" class="font-mono">Apr 28, 2024</span>
+                <span id="modalReadTime" class="font-mono">5 min read</span>
+            </div>
+            <div id="modalContent" class="prose prose-invert max-w-none text-gray-300 space-y-4">
+                <!-- Content loaded dynamically -->
+            </div>
+            
+            <!-- Comments Section -->
+            <div class="mt-12 pt-8 border-t border-white/10">
+                <h3 class="text-xl font-bold mb-6">Comments</h3>
+                
+                <!-- Comment Form -->
+                <div class="mb-8">
+                    <textarea id="commentText" rows="3" placeholder="Share your thoughts..." class="w-full bg-[#0A0A0A] border border-[#222] rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+                    <div class="flex justify-end mt-3">
+                        <button onclick="addComment()" class="btn-primary px-5 py-2 rounded-lg text-sm font-semibold">Post Comment</button>
+                    </div>
+                </div>
+                
+                <!-- Comments List -->
+                <div id="commentsList" class="space-y-4">
+                    <div class="comment">
+                        <div class="flex gap-3">
+                            <div class="avatar">JD</div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <span class="font-semibold text-sm">John Doe</span>
+                                        <span class="text-xs text-gray-500 ml-2 font-mono">2 hours ago</span>
+                                    </div>
+                                    <button onclick="likeComment(this)" class="text-xs text-gray-500 hover:text-emerald-400 transition">❤️ 5</button>
+                                </div>
+                                <p class="text-gray-400 text-sm">Great update! The new scoring engine is incredibly fast. We've seen a 40% reduction in false positives.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comment">
+                        <div class="flex gap-3">
+                            <div class="avatar">SM</div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <span class="font-semibold text-sm">Sarah Mbeki</span>
+                                        <span class="text-xs text-gray-500 ml-2 font-mono">1 day ago</span>
+                                    </div>
+                                    <button onclick="likeComment(this)" class="text-xs text-gray-500 hover:text-emerald-400 transition">❤️ 12</button>
+                                </div>
+                                <p class="text-gray-400 text-sm">The behavioral profiling feature is a game-changer. Integration was seamless!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="max-w-7xl mx-auto px-6 py-12 border-t border-white/10">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+        <div>
+            <h4 class="text-sm font-mono text-gray-500 mb-3">Product</h4>
+            <div class="flex flex-col gap-2">
+                <a href="/features.html" class="text-sm text-gray-400 hover:text-emerald-400 transition">Features</a>
+                <a href="/pricing.html" class="text-sm text-gray-400 hover:text-emerald-400 transition">Pricing</a>
+                <a href="/docs.html" class="text-sm text-gray-400 hover:text-emerald-400 transition">Documentation</a>
+            </div>
+        </div>
+        <div>
+            <h4 class="text-sm font-mono text-gray-500 mb-3">Company</h4>
+            <div class="flex flex-col gap-2">
+                <a href="/blog.html" class="text-sm text-gray-400 hover:text-emerald-400 transition">Blog</a>
+                <a href="/contact.html" class="text-sm text-gray-400 hover:text-emerald-400 transition">Contact</a>
+                <a href="/careers" class="text-sm text-gray-400 hover:text-emerald-400 transition">Careers</a>
+            </div>
+        </div>
+        <div>
+            <h4 class="text-sm font-mono text-gray-500 mb-3">Resources</h4>
+            <div class="flex flex-col gap-2">
+                <a href="/docs.html" class="text-sm text-gray-400 hover:text-emerald-400 transition">API Reference</a>
+                <a href="/status" class="text-sm text-gray-400 hover:text-emerald-400 transition">Status</a>
+                <a href="/support" class="text-sm text-gray-400 hover:text-emerald-400 transition">Support</a>
+            </div>
+        </div>
+        <div>
+            <h4 class="text-sm font-mono text-gray-500 mb-3">Legal</h4>
+            <div class="flex flex-col gap-2">
+                <a href="/privacy" class="text-sm text-gray-400 hover:text-emerald-400 transition">Privacy</a>
+                <a href="/terms" class="text-sm text-gray-400 hover:text-emerald-400 transition">Terms</a>
+                <a href="/security" class="text-sm text-gray-400 hover:text-emerald-400 transition">Security</a>
+            </div>
+        </div>
+    </div>
+    <div class="text-center text-gray-500 text-xs">
+        <p>&copy; 2024 TrustGrid. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+    // Blog posts data
+    const posts = {
+        1: {
+            title: "Real-Time Scoring Engine v2.0",
+            tag: "🚀 Product Update",
+            date: "Apr 28, 2024",
+            readTime: "5 min read",
+            content: `<p>We're excited to announce the launch of TrustGrid Scoring Engine v2.0 — a complete overhaul of our fraud detection core.</p>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">What's New</h3>
+                      <ul class="list-disc pl-5 space-y-2">
+                          <li>5-factor weighted scoring model (Amount: 25%, Velocity: 20%, Location: 25%, Time: 10%, Behavioral: 20%)</li>
+                          <li>Sub-25ms latency — 40% faster than previous version</li>
+                          <li>Fraud probability scoring (0-1 scale with sigmoid conversion)</li>
+                          <li>Confidence scoring based on data completeness</li>
+                          <li>Critical combo multipliers for fraud rings detection</li>
+                      </ul>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">Performance Improvements</h3>
+                      <p>Early customers are reporting a 40% reduction in false positives and a 25% increase in fraud detection accuracy. The new engine processes over 2,000 requests per second per instance.</p>
+                      <div class="code-block bg-black/50 rounded-lg p-4 mt-4 font-mono text-sm text-emerald-400 overflow-x-auto">
+                          <pre>{
+  "risk_score": 75,
+  "fraud_probability": 0.82,
+  "confidence": 0.73,
+  "decision": "flag",
+  "processing_time_ms": 23
+}</pre>
+                      </div>
+                      <p class="mt-4">All customers on Pro and Enterprise plans have been automatically upgraded. No action required.</p>`
+        },
+        2: {
+            title: "5-Minute Integration for Startups",
+            tag: "📘 Integration Guide",
+            date: "Apr 25, 2024",
+            readTime: "8 min read",
+            content: `<p>Getting started with TrustGrid takes less than 5 minutes. Here's a complete walkthrough for Node.js applications.</p>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">Step 1: Install the SDK</h3>
+                      <div class="code-block bg-black/50 rounded-lg p-4 font-mono text-sm text-emerald-400 overflow-x-auto">
+                          <pre>npm install @trustgrid/node</pre>
+                      </div>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">Step 2: Initialize the client</h3>
+                      <div class="code-block bg-black/50 rounded-lg p-4 font-mono text-sm text-emerald-400 overflow-x-auto">
+                          <pre>import TrustGrid from '@trustgrid/node';
+
+const trustgrid = new TrustGrid({
+  apiKey: process.env.TRUSTGRID_API_KEY
+});</pre>
+                      </div>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">Step 3: Check transactions</h3>
+                      <div class="code-block bg-black/50 rounded-lg p-4 font-mono text-sm text-emerald-400 overflow-x-auto">
+                          <pre>const result = await trustgrid.check({
+  transaction_id: "tx_001",
+  user_id: "user_123",
+  amount: 15000
+});
+
+if (result.decision === 'approve') {
+  // Process payment
+} else if (result.decision === 'flag') {
+  // Require 2FA
+} else {
+  // Block transaction
+}</pre>
+                      </div>
+                      <p class="mt-4">That's it! Your application is now protected by enterprise-grade fraud detection.</p>`
+        },
+        3: {
+            title: "How PayFast Reduced Fraud by 67%",
+            tag: "🏆 Case Study",
+            date: "Apr 20, 2024",
+            readTime: "10 min read",
+            content: `<p>PayFast, a leading payment processor in Africa, was losing over $500,000 annually to fraudulent transactions. After implementing TrustGrid, they achieved remarkable results.</p>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">The Challenge</h3>
+                      <p>PayFast was using a rules-based fraud system that generated 15% false positives and missed 30% of actual fraud. Manual review teams were overwhelmed during peak hours.</p>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">The Solution</h3>
+                      <p>TrustGrid's behavioral scoring engine was deployed in under 10 minutes. The system learned normal user behavior patterns and flagged anomalies in real-time.</p>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">The Results</h3>
+                      <ul class="list-disc pl-5 space-y-2">
+                          <li>67% reduction in fraud losses within 60 days</li>
+                          <li>92% fraud detection accuracy</li>
+                          <li>3% false positive rate</li>
+                          <li>80% reduction in manual review workload</li>
+                          <li>$340,000 saved annually</li>
+                      </ul>`
+        },
+        4: {
+            title: "The Rise of Behavioral Fraud",
+            tag: "📊 Industry Insight",
+            date: "Apr 15, 2024",
+            readTime: "6 min read",
+            content: `<p>Traditional rules-based fraud detection is failing. Modern fraudsters use behavioral manipulation, device spoofing, and social engineering to bypass static rules.</p>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">Why Behavioral Intelligence Matters</h3>
+                      <p>Every user has a unique behavior fingerprint — typical transaction amounts, usual hours, known devices, and common locations. When a transaction deviates from this pattern, it's statistically anomalous.</p>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">The Numbers Don't Lie</h3>
+                      <ul class="list-disc pl-5 space-y-2">
+                          <li>Behavioral detection identifies 94% of fraud vs 71% for rules</li>
+                          <li>False positives drop from 15% to 3%</li>
+                          <li>Detection time improves from 150ms to 25ms</li>
+                      </ul>`
+        },
+        5: {
+            title: "SOC2 Type II Certification",
+            tag: "🔐 Security Update",
+            date: "Apr 10, 2024",
+            readTime: "4 min read",
+            content: `<p>We're proud to announce that TrustGrid has successfully completed its SOC2 Type II audit, demonstrating our commitment to enterprise-grade security.</p>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">What This Means</h3>
+                      <ul class="list-disc pl-5 space-y-2">
+                          <li>Independent verification of our security controls</li>
+                          <li>Compliance with industry standards for data protection</li>
+                          <li>Enterprise-ready for banks and financial institutions</li>
+                      </ul>
+                      <p>The audit covered our API infrastructure, data encryption, access controls, and incident response procedures. Our SOC2 report is available to enterprise customers upon request.</p>`
+        },
+        6: {
+            title: "Optimizing Your Fraud Rules",
+            tag: "🛡️ Best Practices",
+            date: "Apr 5, 2024",
+            readTime: "7 min read",
+            content: `<p>Configuring fraud rules is both an art and a science. Here's how to optimize your TrustGrid configuration for maximum effectiveness.</p>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">Start with Data</h3>
+                      <p>The more transaction data you provide, the better our model performs. Include device_id, location, ip_address, and timestamp whenever possible.</p>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">Adjust Thresholds Gradually</h3>
+                      <p>Start with default thresholds and monitor performance. Adjust risk score thresholds based on your business's risk tolerance.</p>
+                      <h3 class="text-xl font-semibold text-white mt-6 mb-3">Monitor False Positives</h3>
+                      <p>Use our webhook alerts to track flagged transactions. Review false positives to identify patterns and adjust rules accordingly.</p>`
+        }
+    };
+    
+    function openPost(id) {
+        const post = posts[id];
+        if (!post) return;
+        
+        document.getElementById('modalTag').innerHTML = post.tag;
+        document.getElementById('modalTitle').innerHTML = post.title;
+        document.getElementById('modalDate').innerHTML = post.date;
+        document.getElementById('modalReadTime').innerHTML = post.readTime;
+        document.getElementById('modalContent').innerHTML = post.content;
+        
+        document.getElementById('postModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeModal(event) {
+        if (!event || event.target === document.getElementById('postModal') || !event) {
+            document.getElementById('postModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+    }
+    
+    function addComment() {
+        const text = document.getElementById('commentText').value.trim();
+        if (!text) return;
+        
+        const commentsList = document.getElementById('commentsList');
+        const newComment = document.createElement('div');
+        newComment.className = 'comment';
+        newComment.innerHTML = `
+            <div class="flex gap-3">
+                <div class="avatar">👤</div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="font-semibold text-sm">Anonymous</span>
+                            <span class="text-xs text-gray-500 ml-2 font-mono">just now</span>
+                        </div>
+                        <button onclick="likeComment(this)" class="text-xs text-gray-500 hover:text-emerald-400 transition">❤️ 0</button>
+                    </div>
+                    <p class="text-gray-400 text-sm">${escapeHtml(text)}</p>
+                </div>
+            </div>
+        `;
+        
+        commentsList.insertBefore(newComment, commentsList.firstChild);
+        document.getElementById('commentText').value = '';
+    }
+    
+    function likeComment(btn) {
+        const text = btn.innerText;
+        const match = text.match(/(\d+)/);
+        const currentLikes = match ? parseInt(match[0]) : 0;
+        btn.innerText = `❤️ ${currentLikes + 1}`;
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Category filtering
+    document.querySelectorAll('[data-category]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const category = btn.getAttribute('data-category');
+            
+            document.querySelectorAll('[data-category]').forEach(b => {
+                b.classList.remove('category-active');
+            });
+            btn.classList.add('category-active');
+            
+            document.querySelectorAll('.blog-card').forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
+</script>
+
+</body>
+</html>
